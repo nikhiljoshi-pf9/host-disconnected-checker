@@ -119,7 +119,7 @@ def handle_pmo():
         "source admin_admin.rc 2>/dev/null || true; "
         "/opt/pf9/du-tools/du-ctl/du_ctl --format table host list | grep -F \"{host}\"'"
     ).format(host=host_id)
-    ssh_cmd = f"ssh -tt -o StrictHostKeyChecking=accept-new nikhil.joshi@{fqdn} {shlex.quote(remote)}"
+    ssh_cmd = f"ssh -tt -o StrictHostKeyChecking=accept-new {fqdn} {shlex.quote(remote)}"
 
     # interactive SSH so user can complete any password/MFA
     run_shell(ssh_cmd, interactive=True)
