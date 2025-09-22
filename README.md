@@ -1,7 +1,9 @@
 **Host Disconnected Checker**
+
 This script is an interactive troubleshooting tool for checking the status of hosts in three environments: PMK, PMO, and PCD. It automates manual steps and guides users through authentication, Kubernetes, AWS, and MySQL queries to quickly diagnose host connectivity issues.
 
 **Features**
+
 **PMK:**
 Prompts for Kubernetes namespace and host ID
 Finds the relevant pod and runs a MySQL query to display host status in a table
