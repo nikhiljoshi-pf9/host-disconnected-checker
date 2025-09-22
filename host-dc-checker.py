@@ -78,17 +78,33 @@ def handle_pmk():
 
     print(f"✅ Using pod: {pod}")
 
-    query = f"SELECT id,name,responding FROM hosts WHERE id='{host_id}';"
+    query = f"SELECT id,hostname,responding FROM hosts WHERE id='{host_id}';"
     mysql_cmd = [
         "kubectl", "exec", "-n", ns, "deploy/mysqld-exporter", "-c", "mysqld-exporter",
-        "--", "mysql", "resmgr", "-u", "root", "-e", query
+        "--", "mysql", "resmgr", "-e", query
     ]
     out = run_list(mysql_cmd, capture=True)
     if out is None:
         print("❌ MySQL query failed.")
         return
     print("\n✅ Query result:")
-    print(out.strip() or "(no rows)")
+    # pretty-print table
+    lines = [line for line in out.strip().split('\n') if line.strip()]
+    if len(lines) < 2:
+        print("(no rows)")
+        return
+    headers = lines[0].split()
+    rows = [line.split() for line in lines[1:]]
+    # Calculate column widths
+    col_widths = [max(len(str(item)) for item in [header] + [row[i] for row in rows]) for i, header in enumerate(headers)]
+    def format_row(row):
+        return " | ".join(str(item).ljust(col_widths[i]) for i, item in enumerate(row))
+    # Print header
+    print(format_row(headers))
+    print("-+-".join('-' * w for w in col_widths))
+    # Print rows
+    for row in rows:
+        print(format_row(row))
 
 # -----------------------
 # PMO (left as-is)
@@ -219,7 +235,19 @@ def handle_pcd():
         print("❌ MySQL command failed. Possible causes: wrong admin_pass, mysql not reachable, or permissions.")
         return
     print("\n✅ Query result:")
-    print(out.strip() or "(no rows)")
+    lines = [line for line in out.strip().split('\n') if line.strip()]
+    if len(lines) < 2:
+        print("(no rows)")
+        return
+    headers = lines[0].split()
+    rows = [line.split() for line in lines[1:]]
+    col_widths = [max(len(str(item)) for item in [header] + [row[i] for row in rows]) for i, header in enumerate(headers)]
+    def format_row(row):
+        return " | ".join(str(item).ljust(col_widths[i]) for i, item in enumerate(row))
+    print(format_row(headers))
+    print("-+-".join('-' * w for w in col_widths))
+    for row in rows:
+        print(format_row(row))
 
 # -----------------------
 # main
@@ -231,6 +259,9 @@ def main():
     print("3. PCD")
     choice = input("Enter choice (1/2/3): ").strip()
     if choice == "1":
+        print()
+        print("\033[1m\033[34mPlease ensure you have KUBECONFIG exported with absolute path.\033[0m")
+        print()
         handle_pmk()
     elif choice == "2":
         handle_pmo()
