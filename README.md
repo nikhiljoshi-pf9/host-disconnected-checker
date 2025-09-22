@@ -18,7 +18,7 @@ Retrieves admin password and runs a MySQL query to display host status in a tabl
 **Prerequisites**
 - Python 3 (3.6+)
 - System tools: kubectl, ssh, saml2aws, aws CLI
-- KUBECONFIG exported with absolute path.
+- KUBECONFIG exported with absolute path for PMK envs.
 - Access to relevant Kubernetes clusters and AWS accounts
 
 **Usage**
